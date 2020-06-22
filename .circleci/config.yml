@@ -24,8 +24,6 @@ references:
         echo export CARMINE_STAGE=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $3}') >> $BASH_ENV
         # version
         echo export CARMINE_VER=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $4}') >> $BASH_ENV
-        # date
-        echo export CARMINE_TODAY=$(date "+%Y%m%d") >> $BASH_ENV
         source $BASH_ENV
 
 jobs:
@@ -49,24 +47,21 @@ jobs:
           echo CARMINE_SVC: $CARMINE_SVC
           echo CARMINE_STAGE: $CARMINE_STAGE
           echo CARMINE_VER: $CARMINE_VER
-          echo CARMINE_TODAY: $CARMINE_TODAY
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
-          DOCKER_TAG=$CARMINE_VER-$CARMINE_TODAY
+          DOCKER_TAG=$CARMINE_VER
           echo DOCKER_TAG: $DOCKER_TAG
           STAGE_LOW=$(echo $CARMINE_STAGE | tr '[:lower:]' '[:upper:]')
           echo stage=${STAGE_LOW} > ./gradle.properties
-          echo org.gradle.daemon=true >> ./gradle.properties
           cat ./gradle.properties
     - run:
         command: |
           echo CARMINE_SVC: $CARMINE_SVC
           echo CARMINE_STAGE: $CARMINE_STAGE
           echo CARMINE_VER: $CARMINE_VER
-          echo CARMINE_TODAY: $CARMINE_TODAY
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
-          DOCKER_TAG=$CARMINE_VER-$CARMINE_TODAY-$CARMINE_SVC-$CARMINE_STAGE
+          DOCKER_TAG=$CARMINE_VER-$CARMINE_SVC-$CARMINE_STAGE
           echo DOCKER_TAG: $DOCKER_TAG
           STAGE_LOW=$(echo $CARMINE_STAGE | tr '[:lower:]' '[:upper:]')
           echo stage=${STAGE_LOW} > ./gradle.properties
