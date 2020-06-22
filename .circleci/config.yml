@@ -61,7 +61,7 @@ workflows:
     - checkout_code:
         filters:
           tags:
-            only: /^build\/hoge\/(it|prod)\/v.*/
+            only: /^build/hoge/(it|prod)/v.*/
           branches:
             ignore: /.*/
 
@@ -70,6 +70,6 @@ workflows:
         - checkout_code
         filters:
           tags:
-            only: /^build\/hoge\/(it|prod)\/v.*/
+            only: /^build/hoge/(it|prod)/v.*/
           branches:
             ignore: /.*/
