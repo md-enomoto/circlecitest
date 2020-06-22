@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 references:
   jdk_container: &jdk_container
@@ -49,6 +49,10 @@ jobs:
           echo DOCKER_TAG: $DOCKER_TAG
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
+          cat << EOF > ./gradle.properties
+          stage=$(echo $STAGE | tr '[:lower:]' '[:upper:]')
+          EOF
+          cat ./gradle.properties
     - save_cache:
         key: circlecitest-build-batch-{{ .Environment.CIRCLE_SHA1 }}
         paths:
