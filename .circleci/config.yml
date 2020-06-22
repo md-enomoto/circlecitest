@@ -32,25 +32,27 @@ jobs:
     steps:
     - checkout
     - save_cache:
-        key: code3test-code-{{ .Environment.CIRCLE_SHA1 }}
+        key: circlecitest-code-{{ .Environment.CIRCLE_SHA1 }}
         paths:
-        - ~/money-design/code3test
+        - ~/md-enomoto/circlecitest
 
   build_carmine_batch:
     <<: *jdk_container
     steps:
     - restore_cache:
-        key: code3test-code-{{ .Environment.CIRCLE_SHA1 }}
+        key: circlecitest-code-{{ .Environment.CIRCLE_SHA1 }}
     - *set_GitTag
     - run:
         command: |
-          echo $SVC
-          echo $STAGE
-          echo $DOCKER_TAG
+          echo SVC: $SVC
+          echo STAGE: $STAGE
+          echo DOCKER_TAG: $DOCKER_TAG
+          echo CIRCLE_TAG: $CIRCLE_TAG
+          echo CIRCLE_BRANCH: $CIRCLE_BRANCH
     - save_cache:
-        key: code3test-build-batch-{{ .Environment.CIRCLE_SHA1 }}
+        key: circlecitest-build-batch-{{ .Environment.CIRCLE_SHA1 }}
         paths:
-        - ~/money-design/code3test
+        - ~/md-enomoto/circlecitest
 
 workflows:
   version: 2
@@ -60,16 +62,16 @@ workflows:
         name: checkout_code
         filters:
           tags:
-            only: /^build\/docomo\/(it|prod)\/v.*/
+            only: /^build\/hoge\/(it|prod)\/v.*/
           branches:
             ignore: /.*/
 
-    - build_code3test:
-        name: code3test
+    - build_circlecitest:
+        name: build_circlecitest
         requires:
         - checkout_code
         filters:
           tags:
-            only: /^build\/docomo\/(it|prod)\/v.*/
+            only: /^build\/hoge\/(it|prod)\/v.*/
           branches:
             ignore: /.*/
