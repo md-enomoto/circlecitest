@@ -49,10 +49,18 @@ jobs:
           echo DOCKER_TAG: $DOCKER_TAG
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
-          cat \<\< EOF > ./gradle.properties
-          stage=$(echo $STAGE | tr '[:lower:]' '[:upper:]')
-          EOF
+          echo stage=$(echo $STAGE | tr '[:lower:]' '[:upper:]') > ./gradle.properties
+          echo org.gradle.daemon=true >> ./gradle.properties
           cat ./gradle.properties
+    - run:
+        command: |
+          echo SVC: $SVC
+          echo STAGE: $STAGE
+          echo DOCKER_TAG: $DOCKER_TAG
+          echo CIRCLE_TAG: $CIRCLE_TAG
+          echo CIRCLE_BRANCH: $CIRCLE_BRANCH
+          echo stage=$(echo $STAGE | tr '[:lower:]' '[:upper:]') > ./gradle.properties2
+          cat ./gradle.properties2
     - save_cache:
         key: circlecitest-build-batch-{{ .Environment.CIRCLE_SHA1 }}
         paths:
