@@ -25,7 +25,7 @@ references:
         # version
         echo export CARMINE_VER=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $4}') >> $BASH_ENV
         # date
-        echo export CARMINE_TODAY=`date "+%Y%m%d"`
+        echo export CARMINE_TODAY=$(date "+%Y%m%d") >> $BASH_ENV
         source $BASH_ENV
 
 jobs:
