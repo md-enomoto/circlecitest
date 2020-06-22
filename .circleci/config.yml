@@ -19,11 +19,13 @@ references:
       command: |
         # ex $CIRCLE_TAG = build/docomo/prod/v20200101-01
         # svc
-        echo export SVC=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $2}') >> $BASH_ENV
+        echo export CARMINE_SVC=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $2}') >> $BASH_ENV
         # stage
-        echo export STAGE=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $3}') >> $BASH_ENV
-        # docker tag
-        echo export DOCKER_TAG=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $4}') >> $BASH_ENV
+        echo export CARMINE_STAGE=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $3}') >> $BASH_ENV
+        # version
+        echo export CARMINE_VER=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $4}') >> $BASH_ENV
+        # date
+        echo export CARMINE_TODAY=`date "+%Y%m%d"`
         source $BASH_ENV
 
 jobs:
@@ -44,24 +46,31 @@ jobs:
     - *set_GitTag
     - run:
         command: |
-          echo SVC: $SVC
-          echo STAGE: $STAGE
-          echo DOCKER_TAG: $DOCKER_TAG
+          echo CARMINE_SVC: $CARMINE_SVC
+          echo CARMINE_STAGE: $CARMINE_STAGE
+          echo CARMINE_VER: $CARMINE_VER
+          echo CARMINE_TODAY: $CARMINE_TODAY
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
-          STAGE_LOW=$(echo $STAGE | tr '[:lower:]' '[:upper:]')
+          DOCKER_TAG=$CARMINE_VER-$CARMINE_TODAY
+          echo DOCKER_TAG: $DOCKER_TAG
+          STAGE_LOW=$(echo $CARMINE_STAGE | tr '[:lower:]' '[:upper:]')
           echo stage=${STAGE_LOW} > ./gradle.properties
           echo org.gradle.daemon=true >> ./gradle.properties
           cat ./gradle.properties
     - run:
         command: |
-          echo SVC: $SVC
-          echo STAGE: $STAGE
-          echo DOCKER_TAG: $DOCKER_TAG
+          echo CARMINE_SVC: $CARMINE_SVC
+          echo CARMINE_STAGE: $CARMINE_STAGE
+          echo CARMINE_VER: $CARMINE_VER
+          echo CARMINE_TODAY: $CARMINE_TODAY
           echo CIRCLE_TAG: $CIRCLE_TAG
           echo CIRCLE_BRANCH: $CIRCLE_BRANCH
-          STAGE_LOW=$(echo $STAGE | tr '[:lower:]' '[:upper:]')
-          echo stage=$(echo $STAGE | tr '[:lower:]' '[:upper:]') > ./gradle.properties2
+          DOCKER_TAG=$CARMINE_VER-$CARMINE_TODAY-$CARMINE_SVC-$CARMINE_STAGE
+          echo DOCKER_TAG: $DOCKER_TAG
+          STAGE_LOW=$(echo $CARMINE_STAGE | tr '[:lower:]' '[:upper:]')
+          echo stage=${STAGE_LOW} > ./gradle.properties
+          echo org.gradle.daemon=true >> ./gradle.properties2
           cat ./gradle.properties2
     - save_cache:
         key: circlecitest-build-batch-{{ .Environment.CIRCLE_SHA1 }}
