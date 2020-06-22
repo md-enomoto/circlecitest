@@ -59,7 +59,6 @@ workflows:
   build_and_push:
     jobs:
     - checkout_code:
-        name: checkout_code
         filters:
           tags:
             only: /^build\/hoge\/(it|prod)\/v.*/
@@ -67,7 +66,6 @@ workflows:
             ignore: /.*/
 
     - build_circlecitest:
-        name: build_circlecitest
         requires:
         - checkout_code
         filters:
