@@ -1,0 +1,75 @@
+version: 2
+
+references:
+  jdk_container: &jdk_container
+    docker:
+    - image: circleci/openjdk:11-jdk
+      environment:
+        TZ: "/usr/share/zoneinfo/Asia/Tokyo"
+    working_directory: ~/money-design/code3test
+  docker_login: &docker_login
+    run:
+      name: docker_login
+      command: |
+        echo $GCLOUD_SERVICE_KEY_MD_DEV_00 | base64 -d > ${HOME}/gcloud-service-key.json
+        docker login -u _json_key -p "$(cat ${HOME}/gcloud-service-key.json)" https://gcr.io
+  set_GitBranch: &set_GitTag
+    run:
+      name: set_GitTag
+      command: |
+        # ex $CIRCLE_TAG = build/docomo/prod/v20200101-01
+        # svc
+        echo export SVC=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $2}') >> $BASH_ENV
+        # stage
+        echo export STAGE=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $3}') >> $BASH_ENV
+        # docker tag
+        echo export DOCKER_TAG=$(echo $CIRCLE_TAG | sed "s#/#\ #g" | awk '{print $4}') >> $BASH_ENV
+        source $BASH_ENV
+
+jobs:
+  checkout_code:
+    <<: *jdk_container
+    steps:
+    - checkout
+    - save_cache:
+        key: code3test-code-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+        - ~/money-design/code3test
+
+  build_carmine_batch:
+    <<: *jdk_container
+    steps:
+    - restore_cache:
+        key: code3test-code-{{ .Environment.CIRCLE_SHA1 }}
+    - *set_GitTag
+    - run:
+        command: |
+          echo $SVC
+          echo $STAGE
+          echo $DOCKER_TAG
+    - save_cache:
+        key: code3test-build-batch-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+        - ~/money-design/code3test
+
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+    - checkout_code:
+        name: checkout_code
+        filters:
+          tags:
+            only: /^build\/docomo\/(it|prod)\/v.*/
+          branches:
+            ignore: /.*/
+
+    - build_code3test:
+        name: code3test
+        requires:
+        - checkout_code
+        filters:
+          tags:
+            only: /^build\/docomo\/(it|prod)\/v.*/
+          branches:
+            ignore: /.*/
